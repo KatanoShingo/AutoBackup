@@ -1,2 +1,3 @@
 # AutoBackup
-AutoSaveの派生
+AutoSaveをUnity2018でも動作するようにしました。  
+AutoSave → http://tsubakit1.hateblo.jp/entry/20140131/1391094449
