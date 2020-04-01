@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.IO;
+using UnityEditor.SceneManagement;
 
 [InitializeOnLoad]
 public class AutoSave
@@ -14,7 +15,7 @@ public class AutoSave
     static AutoSave()
     {
         IsManualSave = true;
-        EditorApplication.playmodeStateChanged += () =>
+        EditorApplication.playModeStateChanged += (state) =>
         {
             if (IsAutoSave && !EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode)
             {
@@ -22,11 +23,11 @@ public class AutoSave
                 IsManualSave = false;
 
                 if (IsSavePrefab)
-                    EditorApplication.SaveAssets();
+                    AssetDatabase.SaveAssets();
                 if (IsSaveScene)
                 {
                     Debug.Log("save scene " + System.DateTime.Now);
-                    EditorApplication.SaveScene();
+                    EditorSceneManager.SaveOpenScenes();
                 }
                 IsManualSave = true;
             }
@@ -45,11 +46,11 @@ public class AutoSave
                 if (IsSaveSceneTimer && IsAutoSave && !EditorApplication.isPlaying)
                 {
                     if (IsSavePrefab)
-                        EditorApplication.SaveAssets();
+                        AssetDatabase.SaveAssets();
                     if (IsSaveScene)
                     {
                         Debug.Log("save scene " + System.DateTime.Now);
-                        EditorApplication.SaveScene();
+                        EditorSceneManager.SaveOpenScenes();
                     }
                 }
                 isChangedHierarchy = false;
@@ -57,7 +58,7 @@ public class AutoSave
             }
         };
 
-        EditorApplication.hierarchyWindowChanged += () =>
+        EditorApplication.hierarchyChanged += () =>
         {
             if (!EditorApplication.isPlaying)
                 isChangedHierarchy = true;
@@ -174,24 +175,24 @@ public class AutoSave
     [MenuItem("File/Backup/Backup")]
     public static void Backup()
     {
-        string expoertPath = "Backup/" + EditorApplication.currentScene;
+        string expoertPath = "Backup/" + EditorSceneManager.GetActiveScene().path;
 
         Directory.CreateDirectory(Path.GetDirectoryName(expoertPath));
 
-        if (string.IsNullOrEmpty(EditorApplication.currentScene))
+        if (string.IsNullOrEmpty(EditorSceneManager.GetActiveScene().path))
             return;
 
-        byte[] data = File.ReadAllBytes(EditorApplication.currentScene);
+        byte[] data = File.ReadAllBytes(EditorSceneManager.GetActiveScene().path);
         File.WriteAllBytes(expoertPath, data);
     }
 
     [MenuItem("File/Backup/Rollback")]
     public static void RollBack()
     {
-        string expoertPath = "Backup/" + EditorApplication.currentScene;
+        string expoertPath = "Backup/" + EditorSceneManager.GetActiveScene().path;
 
         byte[] data = File.ReadAllBytes(expoertPath);
-        File.WriteAllBytes(EditorApplication.currentScene, data);
+        File.WriteAllBytes(EditorSceneManager.GetActiveScene().path, data);
         AssetDatabase.Refresh(ImportAssetOptions.Default);
     }
 
