@@ -5,19 +5,19 @@ using System.IO;
 using UnityEditor.SceneManagement;
 
 [InitializeOnLoad]
-public class AutoSave
+public class AutoBackup
 {
-    public static readonly string manualSaveKey = "autosave@manualSave";
+    public static readonly string manualSaveKey = "autobackup@manualSave";
 
     static double nextTime = 0;
     static bool isChangedHierarchy = false;
 
-    static AutoSave()
+    static AutoBackup()
     {
         IsManualSave = true;
         EditorApplication.playModeStateChanged += (state) =>
         {
-            if (IsAutoSave && !EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode)
+            if (IsAutoBackup && !EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode)
             {
 
                 IsManualSave = false;
@@ -43,7 +43,7 @@ public class AutoSave
 
                 IsManualSave = false;
 
-                if (IsSaveSceneTimer && IsAutoSave && !EditorApplication.isPlaying)
+                if (IsSaveSceneTimer && IsAutoBackup && !EditorApplication.isPlaying)
                 {
                     if (IsSavePrefab)
                         AssetDatabase.SaveAssets();
@@ -78,69 +78,69 @@ public class AutoSave
     }
 
 
-    private static readonly string autoSave = "auto save";
-    static bool IsAutoSave
+    private static readonly string autoBackup = "auto backup";
+    static bool IsAutoBackup
     {
         get
         {
-            string value = EditorUserSettings.GetConfigValue(autoSave);
+            string value = EditorUserSettings.GetConfigValue(autoBackup);
             return !string.IsNullOrEmpty(value) && value.Equals("True");
         }
         set
         {
-            EditorUserSettings.SetConfigValue(autoSave, value.ToString());
+            EditorUserSettings.SetConfigValue(autoBackup, value.ToString());
         }
     }
 
-    private static readonly string autoSavePrefab = "auto save prefab";
+    private static readonly string autoBackupPrefab = "auto backup prefab";
     static bool IsSavePrefab
     {
         get
         {
-            string value = EditorUserSettings.GetConfigValue(autoSavePrefab);
+            string value = EditorUserSettings.GetConfigValue(autoBackupPrefab);
             return !string.IsNullOrEmpty(value) && value.Equals("True");
         }
         set
         {
-            EditorUserSettings.SetConfigValue(autoSavePrefab, value.ToString());
+            EditorUserSettings.SetConfigValue(autoBackupPrefab, value.ToString());
         }
     }
 
-    private static readonly string autoSaveScene = "auto save scene";
+    private static readonly string autoBackupScene = "auto save scene";
     static bool IsSaveScene
     {
         get
         {
-            string value = EditorUserSettings.GetConfigValue(autoSaveScene);
+            string value = EditorUserSettings.GetConfigValue(autoBackupScene);
             return !string.IsNullOrEmpty(value) && value.Equals("True");
         }
         set
         {
-            EditorUserSettings.SetConfigValue(autoSaveScene, value.ToString());
+            EditorUserSettings.SetConfigValue(autoBackupScene, value.ToString());
         }
     }
 
-    private static readonly string autoSaveSceneTimer = "auto save scene timer";
+    private static readonly string autoBackupSceneTimer = "auto save scene timer";
     static bool IsSaveSceneTimer
     {
         get
         {
-            string value = EditorUserSettings.GetConfigValue(autoSaveSceneTimer);
+            string value = EditorUserSettings.GetConfigValue(autoBackupSceneTimer);
             return !string.IsNullOrEmpty(value) && value.Equals("True");
         }
         set
         {
-            EditorUserSettings.SetConfigValue(autoSaveSceneTimer, value.ToString());
+            EditorUserSettings.SetConfigValue(autoBackupSceneTimer, value.ToString());
         }
     }
 
-    private static readonly string autoSaveInterval = "save scene interval";
+    private static readonly string autoBackupInterval = "save scene interval";
     static int Interval
     {
         get
         {
 
-            string value = EditorUserSettings.GetConfigValue(autoSaveInterval);
+            string value = EditorUserSettings.GetConfigValue(autoBackupInterval);
             if (value == null)
             {
                 value = "60";
@@ -151,7 +151,7 @@ public class AutoSave
         {
             if (value < 60)
                 value = 60;
-            EditorUserSettings.SetConfigValue(autoSaveInterval, value.ToString());
+            EditorUserSettings.SetConfigValue(autoBackupInterval, value.ToString());
         }
     }
 
@@ -159,9 +159,9 @@ public class AutoSave
     [PreferenceItem("Auto Save")]
     static void ExampleOnGUI()
     {
-        bool isAutoSave = EditorGUILayout.BeginToggleGroup("auto save", IsAutoSave);
+        bool isAutoBackup = EditorGUILayout.BeginToggleGroup("auto save", IsAutoBackup);
 
-        IsAutoSave = isAutoSave;
+        IsAutoBackup = isAutoBackup;
         EditorGUILayout.Space();
 
         IsSavePrefab = EditorGUILayout.ToggleLeft("save prefab", IsSavePrefab);

@@ -7,10 +7,10 @@ public class SceneBackup : UnityEditor.AssetModificationProcessor
 {
     static string[] OnWillSaveAssets(string[] paths)
     {
-        bool manualSave = AutoSave.IsManualSave;
+        bool manualSave = AutoBackup.IsManualSave;
         if (manualSave)
         {
-            AutoSave.Backup();
+            AutoBackup.Backup();
         }
 
         return paths;
