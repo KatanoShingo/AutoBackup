@@ -2,17 +2,19 @@
 using UnityEditor;
 using System.Collections;
 
-
-public class SceneBackup : UnityEditor.AssetModificationProcessor
+namespace AutoBackup
 {
-    static string[] OnWillSaveAssets(string[] paths)
+    public class SceneBackup : UnityEditor.AssetModificationProcessor
     {
-        bool manualSave = AutoBackup.IsManualSave;
-        if (manualSave)
+        static string[] OnWillSaveAssets(string[] paths)
         {
-            AutoBackup.Backup();
-        }
+            bool manualSave = AutoBackup.IsManualSave;
+            if (manualSave)
+            {
+                AutoBackup.Backup();
+            }
 
-        return paths;
+            return paths;
+        }
     }
 }
