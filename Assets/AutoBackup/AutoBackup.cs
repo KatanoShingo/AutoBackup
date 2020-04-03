@@ -120,9 +120,7 @@ namespace AutoBackup
         [PreferenceItem("Auto Backup")]
         static void ExampleOnGUI()
         {
-            bool isAutoBackup = EditorGUILayout.BeginToggleGroup("auto backup", IsAutoBackup);
-
-            IsAutoBackup = isAutoBackup;
+            IsAutoBackup = EditorGUILayout.BeginToggleGroup("auto backup", IsAutoBackup);
             EditorGUILayout.Space();
             
             IsBackupScene = EditorGUILayout.ToggleLeft("backup scene", IsBackupScene);
