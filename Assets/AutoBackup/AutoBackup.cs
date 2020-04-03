@@ -17,22 +17,6 @@ namespace AutoBackup
         static AutoBackup()
         {
             IsManualSave = true;
-            EditorApplication.playModeStateChanged += (state) =>
-            {
-                if (IsAutoBackup && !EditorApplication.isPlaying && EditorApplication.isPlayingOrWillChangePlaymode)
-                {
-
-                    IsManualSave = false;
-
-                    if (IsBackupScene)
-                    {
-                        Debug.Log("backup scene " + System.DateTime.Now);
-                        Backup();
-                    }
-                    IsManualSave = true;
-                }
-                isChangedHierarchy = false;
-            };
 
             nextTime = EditorApplication.timeSinceStartup + Interval;
             EditorApplication.update += () =>
