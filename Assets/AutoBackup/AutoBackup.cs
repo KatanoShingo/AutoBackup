@@ -26,7 +26,7 @@ namespace AutoBackup
 
                     IsManualSave = false;
 
-                    if (IsSaveSceneTimer && IsAutoBackup && !EditorApplication.isPlaying)
+                    if ( IsAutoBackup && !EditorApplication.isPlaying )
                     {
                             Debug.Log("backup scene " + System.DateTime.Now);
                             Backup();
@@ -63,21 +63,6 @@ namespace AutoBackup
             }
         }
 
-
-        private static readonly string autoBackupSceneTimer = "auto backup scene timer";
-        static bool IsSaveSceneTimer
-        {
-            get
-            {
-                string value = EditorUserSettings.GetConfigValue(autoBackupSceneTimer);
-                return !string.IsNullOrEmpty(value) && value.Equals("True");
-            }
-            set
-            {
-                EditorUserSettings.SetConfigValue(autoBackupSceneTimer, value.ToString());
-            }
-        }
-
         private static readonly string autoBackupInterval = "save scene interval";
         static int Interval
         {
@@ -106,9 +91,7 @@ namespace AutoBackup
             IsAutoBackup = EditorGUILayout.BeginToggleGroup("auto backup", IsAutoBackup);
             EditorGUILayout.Space();
             
-            IsSaveSceneTimer = EditorGUILayout.BeginToggleGroup("save scene interval", IsSaveSceneTimer);
             Interval = EditorGUILayout.IntField("interval(sec) min60sec", Interval);
-            EditorGUILayout.EndToggleGroup();
             EditorGUILayout.EndToggleGroup();
         }
 
