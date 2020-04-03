@@ -12,7 +12,6 @@ namespace AutoBackup
         public static readonly string manualSaveKey = "autobackup@manualSave";
 
         static double nextTime = 0;
-        static bool isChangedHierarchy = false;
 
         static AutoBackup()
         {
@@ -21,7 +20,7 @@ namespace AutoBackup
             nextTime = EditorApplication.timeSinceStartup + Interval;
             EditorApplication.update += () =>
             {
-                if (isChangedHierarchy && nextTime < EditorApplication.timeSinceStartup)
+                if ( nextTime < EditorApplication.timeSinceStartup)
                 {
                     nextTime = EditorApplication.timeSinceStartup + Interval;
 
@@ -35,15 +34,8 @@ namespace AutoBackup
                             Backup();
                         }
                     }
-                    isChangedHierarchy = false;
                     IsManualSave = true;
                 }
-            };
-
-            EditorApplication.hierarchyChanged += () =>
-            {
-                if (!EditorApplication.isPlaying)
-                    isChangedHierarchy = true;
             };
         }
 
