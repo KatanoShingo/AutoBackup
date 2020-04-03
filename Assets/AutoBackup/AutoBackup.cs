@@ -15,12 +15,12 @@ namespace AutoBackup
         static AutoBackup()
         {
 
-            nextTime = EditorApplication.timeSinceStartup + Interval;
+            nextTime = EditorApplication.timeSinceStartup + Interval * 60;
             EditorApplication.update += () =>
             {
                 if ( nextTime < EditorApplication.timeSinceStartup)
                 {
-                    nextTime = EditorApplication.timeSinceStartup + Interval;
+                    nextTime = EditorApplication.timeSinceStartup + Interval * 60;
 
                     if (IsAutoBackup && !EditorApplication.isPlaying)
                     {
@@ -56,14 +56,14 @@ namespace AutoBackup
                 string value = EditorUserSettings.GetConfigValue(autoBackupInterval);
                 if (value == null)
                 {
-                    value = "60";
+                    value = "5";
                 }
                 return int.Parse(value);
             }
             set
             {
-                if (value < 60)
-                    value = 60;
+                if (value < 5)
+                    value = 5;
                 EditorUserSettings.SetConfigValue(autoBackupInterval, value.ToString());
             }
         }
@@ -75,7 +75,7 @@ namespace AutoBackup
             IsAutoBackup = EditorGUILayout.BeginToggleGroup("auto backup", IsAutoBackup);
             EditorGUILayout.Space();
             
-            Interval = EditorGUILayout.IntField("interval(sec) min60sec", Interval);
+            Interval = EditorGUILayout.IntField("interval(min) mini5min", Interval);
             EditorGUILayout.EndToggleGroup();
         }
 
