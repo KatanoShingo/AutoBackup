@@ -108,7 +108,7 @@ namespace AutoBackup
             }
         }
 
-        private static readonly string autoBackupScene = "auto save scene";
+        private static readonly string autoBackupScene = "auto backup scene";
         static bool IsSaveScene
         {
             get
@@ -122,7 +122,7 @@ namespace AutoBackup
             }
         }
 
-        private static readonly string autoBackupSceneTimer = "auto save scene timer";
+        private static readonly string autoBackupSceneTimer = "auto backup scene timer";
         static bool IsSaveSceneTimer
         {
             get
@@ -158,10 +158,10 @@ namespace AutoBackup
         }
 
 
-        [PreferenceItem("Auto Save")]
+        [PreferenceItem("Auto Backup")]
         static void ExampleOnGUI()
         {
-            bool isAutoBackup = EditorGUILayout.BeginToggleGroup("auto save", IsAutoBackup);
+            bool isAutoBackup = EditorGUILayout.BeginToggleGroup("auto backup", IsAutoBackup);
 
             IsAutoBackup = isAutoBackup;
             EditorGUILayout.Space();
