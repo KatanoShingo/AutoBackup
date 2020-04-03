@@ -8,11 +8,7 @@ namespace AutoBackup
     {
         static string[] OnWillSaveAssets(string[] paths)
         {
-            bool manualSave = AutoBackup.IsManualSave;
-            if (manualSave)
-            {
-                AutoBackup.Backup();
-            }
+            AutoBackup.Backup();
 
             return paths;
         }

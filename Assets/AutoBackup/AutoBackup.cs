@@ -9,13 +9,11 @@ namespace AutoBackup
     [InitializeOnLoad]
     public class AutoBackup
     {
-        public static readonly string manualSaveKey = "autobackup@manualSave";
 
         static double nextTime = 0;
 
         static AutoBackup()
         {
-            IsManualSave = true;
 
             nextTime = EditorApplication.timeSinceStartup + Interval;
             EditorApplication.update += () =>
@@ -24,29 +22,15 @@ namespace AutoBackup
                 {
                     nextTime = EditorApplication.timeSinceStartup + Interval;
 
-                    IsManualSave = false;
-
-                    if ( IsAutoBackup && !EditorApplication.isPlaying )
+                    if (IsAutoBackup && !EditorApplication.isPlaying)
                     {
-                            Debug.Log("backup scene " + System.DateTime.Now);
-                            Backup();
+                        Debug.Log("backup scene " + System.DateTime.Now);
+                        Backup();
                     }
-                    IsManualSave = true;
                 }
             };
         }
-
-        public static bool IsManualSave
-        {
-            get
-            {
-                return EditorPrefs.GetBool(manualSaveKey);
-            }
-            private set
-            {
-                EditorPrefs.SetBool(manualSaveKey, value);
-            }
-        }
+        
 
 
         private static readonly string autoBackup = "auto backup";
