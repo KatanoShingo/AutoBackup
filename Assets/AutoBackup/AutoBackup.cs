@@ -24,8 +24,6 @@ namespace AutoBackup
 
                     IsManualSave = false;
 
-                    if (IsSavePrefab)
-                        AssetDatabase.SaveAssets();
                     if (IsSaveScene)
                     {
                         Debug.Log("save scene " + System.DateTime.Now);
@@ -47,8 +45,6 @@ namespace AutoBackup
 
                     if (IsSaveSceneTimer && IsAutoBackup && !EditorApplication.isPlaying)
                     {
-                        if (IsSavePrefab)
-                            AssetDatabase.SaveAssets();
                         if (IsSaveScene)
                         {
                             Debug.Log("save scene " + System.DateTime.Now);
@@ -94,19 +90,6 @@ namespace AutoBackup
             }
         }
 
-        private static readonly string autoBackupPrefab = "auto backup prefab";
-        static bool IsSavePrefab
-        {
-            get
-            {
-                string value = EditorUserSettings.GetConfigValue(autoBackupPrefab);
-                return !string.IsNullOrEmpty(value) && value.Equals("True");
-            }
-            set
-            {
-                EditorUserSettings.SetConfigValue(autoBackupPrefab, value.ToString());
-            }
-        }
 
         private static readonly string autoBackupScene = "auto backup scene";
         static bool IsSaveScene
@@ -165,8 +148,7 @@ namespace AutoBackup
 
             IsAutoBackup = isAutoBackup;
             EditorGUILayout.Space();
-
-            IsSavePrefab = EditorGUILayout.ToggleLeft("save prefab", IsSavePrefab);
+            
             IsSaveScene = EditorGUILayout.ToggleLeft("save scene", IsSaveScene);
             IsSaveSceneTimer = EditorGUILayout.BeginToggleGroup("save scene interval", IsSaveSceneTimer);
             Interval = EditorGUILayout.IntField("interval(sec) min60sec", Interval);
