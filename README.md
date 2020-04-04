@@ -1,6 +1,6 @@
 
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)    
-
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![BCH compliance](https://bettercodehub.com/edge/badge/KatanoShingo/AutoBackup?branch=master)](https://bettercodehub.com/)  
 *AutoBackup*
 ====
 
