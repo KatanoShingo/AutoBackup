@@ -127,15 +127,5 @@ namespace AutoBackup
             }
         }
 
-        [MenuItem("File/Backup/Rollback")]
-        public static void RollBack()
-        {
-            string expoertPath = "Backup/" + EditorSceneManager.GetActiveScene().path;
-
-            byte[] data = File.ReadAllBytes(expoertPath);
-            File.WriteAllBytes(EditorSceneManager.GetActiveScene().path, data);
-            AssetDatabase.Refresh(ImportAssetOptions.Default);
-        }
-
     }
 }
