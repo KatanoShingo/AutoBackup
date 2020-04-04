@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using System.IO;
 using UnityEditor.SceneManagement;
+using System;
 
 namespace AutoBackup
 {
@@ -67,7 +68,28 @@ namespace AutoBackup
                 EditorUserSettings.SetConfigValue(autoBackupInterval, value.ToString());
             }
         }
+        
+        private static readonly string autoBackupQuantity = "save scene quantity";
+        static int Quantity
+        {
+            get
+            {
 
+                string value = EditorUserSettings.GetConfigValue(autoBackupQuantity);
+                if (value == null)
+                {
+                    value = "1";
+                }
+                return int.Parse(value);
+            }
+            set
+            {
+                if (value < 1)
+                    value = 1;
+                EditorUserSettings.SetConfigValue(autoBackupQuantity, value.ToString());
+            }
+        }
+        
 
         [PreferenceItem("Auto Backup")]
         static void ExampleOnGUI()
@@ -75,14 +97,15 @@ namespace AutoBackup
             IsAutoBackup = EditorGUILayout.BeginToggleGroup("auto backup", IsAutoBackup);
             EditorGUILayout.Space();
             
-            Interval = EditorGUILayout.IntField("interval(min) mini5min", Interval);
+            Interval = EditorGUILayout.IntField("interval(min) mini5", Interval);
+            Quantity = EditorGUILayout.IntField("quantity      mini1", Quantity);
             EditorGUILayout.EndToggleGroup();
         }
 
         [MenuItem("File/Backup/Backup")]
         public static void Backup()
         {
-            string expoertPath = "Backup/" + EditorSceneManager.GetActiveScene().path;
+            string expoertPath = "Backup/" + Path.GetFileNameWithoutExtension(EditorSceneManager.GetActiveScene().path) + DateTime.Now.ToString("MMddHHmm") + Path.GetExtension(EditorSceneManager.GetActiveScene().path);
 
             Directory.CreateDirectory(Path.GetDirectoryName(expoertPath));
 
@@ -91,6 +114,17 @@ namespace AutoBackup
 
             byte[] data = File.ReadAllBytes(EditorSceneManager.GetActiveScene().path);
             File.WriteAllBytes(expoertPath, data);
+
+            var files = Directory.GetFiles(Path.GetDirectoryName(expoertPath));
+            if(files.Length <= Quantity)
+            {
+                return;
+            }
+
+            for (int i = 0; i < files.Length - Quantity; i++)
+            {
+                File.Delete(files[i]);
+            }
         }
 
         [MenuItem("File/Backup/Rollback")]
