@@ -4,6 +4,7 @@ using UnityEngine;
 using System.IO;
 using UnityEditor.SceneManagement;
 using System;
+using System.Linq;
 
 namespace AutoBackup
 {
@@ -19,7 +20,7 @@ namespace AutoBackup
             nextTime = EditorApplication.timeSinceStartup + Interval * 60;
             EditorApplication.update += () =>
             {
-                if ( nextTime < EditorApplication.timeSinceStartup)
+                if (nextTime < EditorApplication.timeSinceStartup)
                 {
                     nextTime = EditorApplication.timeSinceStartup + Interval * 60;
 
@@ -31,11 +32,11 @@ namespace AutoBackup
                 }
             };
         }
-        
+
 
 
         private static readonly string autoBackup = "auto backup";
-        static bool IsAutoBackup
+        public static bool IsAutoBackup
         {
             get
             {
@@ -49,7 +50,7 @@ namespace AutoBackup
         }
 
         private static readonly string autoBackupInterval = "save scene interval";
-        static int Interval
+        public static int Interval
         {
             get
             {
@@ -68,9 +69,9 @@ namespace AutoBackup
                 EditorUserSettings.SetConfigValue(autoBackupInterval, value.ToString());
             }
         }
-        
+
         private static readonly string autoBackupQuantity = "save scene quantity";
-        static int Quantity
+        public static int Quantity
         {
             get
             {
@@ -89,43 +90,100 @@ namespace AutoBackup
                 EditorUserSettings.SetConfigValue(autoBackupQuantity, value.ToString());
             }
         }
-        
 
-        [PreferenceItem("Auto Backup")]
-        static void ExampleOnGUI()
+        [SettingsProvider]
+        public static SettingsProvider CreateAutoBackupProvider()
         {
-            IsAutoBackup = EditorGUILayout.BeginToggleGroup("auto backup", IsAutoBackup);
-            EditorGUILayout.Space();
-            
-            Interval = EditorGUILayout.IntField("interval(min) mini5", Interval);
-            Quantity = EditorGUILayout.IntField("quantity      mini1", Quantity);
-            EditorGUILayout.EndToggleGroup();
+            return new SettingsProvider("Preferences/Auto Backup", SettingsScope.User)
+            {
+                label = "Auto Backup",
+                guiHandler = (searchContext) =>
+                {
+                    AutoBackup.IsAutoBackup = EditorGUILayout.BeginToggleGroup("auto backup", AutoBackup.IsAutoBackup);
+                    EditorGUILayout.Space();
+                    AutoBackup.Interval = EditorGUILayout.IntField("interval(min) mini5", AutoBackup.Interval);
+                    AutoBackup.Quantity = EditorGUILayout.IntField("quantity      mini1", AutoBackup.Quantity);
+                    EditorGUILayout.EndToggleGroup();
+                }
+            };
         }
 
         [MenuItem("File/Backup/Backup")]
         public static void Backup()
         {
-            string expoertPath = "Backup/" + Path.GetFileNameWithoutExtension(EditorSceneManager.GetActiveScene().path) + DateTime.Now.ToString("MMddHHmm") + Path.GetExtension(EditorSceneManager.GetActiveScene().path);
+            string scenePath = EditorSceneManager.GetActiveScene().path;
 
-            Directory.CreateDirectory(Path.GetDirectoryName(expoertPath));
-
-            if (string.IsNullOrEmpty(EditorSceneManager.GetActiveScene().path))
+            if (string.IsNullOrEmpty(scenePath))
                 return;
 
-            byte[] data = File.ReadAllBytes(EditorSceneManager.GetActiveScene().path);
-            File.WriteAllBytes(expoertPath, data);
+            string backupDir = "Backup";
+            string exportPath = Path.Combine(
+                backupDir,
+                Path.GetFileNameWithoutExtension(scenePath) + DateTime.Now.ToString("MMddHHmm") + Path.GetExtension(scenePath)
+            );
 
-            var files = Directory.GetFiles(Path.GetDirectoryName(expoertPath));
-            if(files.Length <= Quantity)
-            {
-                return;
-            }
+            Directory.CreateDirectory(backupDir);
 
-            for (int i = 0; i < files.Length - Quantity; i++)
+            // バックアップ保存
+            byte[] data = File.ReadAllBytes(scenePath);
+            File.WriteAllBytes(exportPath, data);
+            Debug.Log("バックアップ作成: " + exportPath);
+
+            // バックアップの整理
+            var files = new DirectoryInfo(backupDir)
+                .GetFiles()
+                .OrderBy(f => f.CreationTime)
+                .ToArray();
+
+            if (files.Length > Quantity)
             {
-                File.Delete(files[i]);
+                int deleteCount = files.Length - Quantity;
+                for (int i = 0; i < deleteCount; i++)
+                {
+                    try
+                    {
+                        files[i].Delete();
+                        Debug.Log("古いバックアップ削除: " + files[i].Name);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogWarning("削除失敗: " + files[i].Name + "\n" + ex.Message);
+                    }
+                }
             }
         }
 
+        [MenuItem("File/Backup/BackupRestore")]
+        public static void BackupRestore()
+        {
+            string path = EditorUtility.OpenFilePanel("バックアップファイルを選択", "Backup", "unity");
+            if (string.IsNullOrEmpty(path)) return;
+
+            string currentScenePath = EditorSceneManager.GetActiveScene().path;
+            if (string.IsNullOrEmpty(currentScenePath))
+            {
+                EditorUtility.DisplayDialog("エラー", "現在のシーンを保存してから復元を行ってください。", "OK");
+                return;
+            }
+
+            if (EditorUtility.DisplayDialog(
+                "シーン復元の確認",
+                "選択したバックアップファイルで現在のシーンを上書きします。\nこの操作は元に戻せません。\n\n本当に復元しますか？\n\n" + path,
+                "はい、上書きする", "キャンセル"))
+            {
+                try
+                {
+                    File.Copy(path, currentScenePath, true);
+                    AssetDatabase.Refresh();
+                    EditorSceneManager.OpenScene(currentScenePath);
+                    Debug.Log("バックアップからシーンを復元しました: " + path);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError("バックアップの復元に失敗しました: " + ex.Message);
+                    EditorUtility.DisplayDialog("エラー", "バックアップの復元に失敗しました:\n" + ex.Message, "OK");
+                }
+            }
+        }
     }
 }
